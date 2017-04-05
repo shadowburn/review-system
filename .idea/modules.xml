@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ProjectModuleManager">
+    <modules>
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/review-system.iml" filepath="$PROJECT_DIR$/.idea/modules/review-system.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/review-system_main.iml" filepath="$PROJECT_DIR$/.idea/modules/review-system_main.iml" group="review-system" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/review-system_test.iml" filepath="$PROJECT_DIR$/.idea/modules/review-system_test.iml" group="review-system" />
+    </modules>
+  </component>
+</project>
