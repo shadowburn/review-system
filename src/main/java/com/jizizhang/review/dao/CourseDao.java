@@ -12,4 +12,6 @@ public interface CourseDao {
   void add(Course course) throws DaoException;
 
   List<Course> findAll();
+
+  Course findById(int id);
 }
