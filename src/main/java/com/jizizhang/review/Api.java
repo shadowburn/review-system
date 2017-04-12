@@ -16,7 +16,7 @@ import org.sql2o.Sql2o;
  */
 public class Api {
   public static void main(String[] args) {
-    Sql2o sql2o = new Sql2o("jdbc:h2:~/reviews.db;INIT=RUNSCRIPT from 'classpath:db/init.sql'");
+    Sql2o sql2o = new Sql2o("jdbc:h2:~/reviews.db;INIT=RUNSCRIPT from 'classpath:db/init.sql'","", "");
     CourseDao courseDao = new Sql2oCourseDao(sql2o);
     Gson gson = new Gson();
 
@@ -30,10 +30,10 @@ public class Api {
 
     get("/courses", "application/json", (req, res)-> courseDao.findAll(), gson::toJson);
 
-    get("/courses:id", "application/json", (req, res)->{
+    get("/courses/:id", "application/json", (req, res)->{
       int id = Integer.parseInt(req.params("id"));
       Course course = courseDao.findById(id);
-      return null;
+      return course;
     },gson::toJson);
 
     after((req, res)->{
