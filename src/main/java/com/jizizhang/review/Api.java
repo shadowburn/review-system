@@ -1,6 +1,8 @@
 package com.jizizhang.review;
 
 import static spark.Spark.after;
+import static spark.Spark.exception;
+import static spark.Spark.port;
 import static spark.Spark.post;
 import static spark.Spark.get;
 
@@ -8,15 +10,30 @@ import com.google.gson.Gson;
 
 import com.jizizhang.review.dao.CourseDao;
 import com.jizizhang.review.dao.Sql2oCourseDao;
+import com.jizizhang.review.exc.ApiError;
 import com.jizizhang.review.model.Course;
 import org.sql2o.Sql2o;
+
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Created by CalvinZhang on 2017-04-06.
  */
 public class Api {
   public static void main(String[] args) {
-    Sql2o sql2o = new Sql2o("jdbc:h2:~/reviews.db;INIT=RUNSCRIPT from 'classpath:db/init.sql'","", "");
+    String datasource = "jdbc:h2:~/reviews.db";
+    if(args.length > 0){
+      if(args.length != 2){
+        System.out.println("java Api <port> <datasource>");
+        System.exit(0);
+      }
+      port(Integer.parseInt(args[0]));
+      datasource = args[1];
+    }
+
+    Sql2o sql2o = new Sql2o(
+        String.format("%s;INIT=RUNSCRIPT from 'classpath:db/init.sql'", datasource), "", "");
     CourseDao courseDao = new Sql2oCourseDao(sql2o);
     Gson gson = new Gson();
 
@@ -33,8 +50,21 @@ public class Api {
     get("/courses/:id", "application/json", (req, res)->{
       int id = Integer.parseInt(req.params("id"));
       Course course = courseDao.findById(id);
+      if(course==null){
+        throw new ApiError(404, "Could not find course with this ID: "+ id);
+      }
       return course;
     },gson::toJson);
+
+    exception(ApiError.class, (exc, req, res)->{
+      ApiError error = (ApiError) exc;
+      Map<String, Object> jsonMap = new HashMap<>();
+      jsonMap.put("status", error.getStatus());
+      jsonMap.put("errorMessage", error.getMessage());
+      res.type("application/json");
+      res.status(error.getStatus());
+      res.body(gson.toJson(jsonMap));
+    });
 
     after((req, res)->{
       res.type("application/json");
